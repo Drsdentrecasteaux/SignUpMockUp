@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+
+        .container {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #555;
+            font-size: 0.9rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid #e1e1e1;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #4a90e2;
+        }
+
+        .requirements {
+            margin-top: 0.5rem;
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .requirement {
+            display: flex;
+            align-items: center;
+            margin: 0.2rem 0;
+        }
+
+        .requirement::before {
+            content: '●';
+            margin-right: 0.5rem;
+            font-size: 0.6rem;
+            color: #ccc;
+        }
+
+        .requirement.valid::before {
+            color: #2ecc71;
+        }
+
+        button {
+            width: 100%;
+            padding: 0.8rem;
+            background: #4a90e2;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #357abd;
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .error-message {
+            color: #e74c3c;
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Buat Akun</h1>
+        <form id="signupForm" onsubmit="return validateForm(event)">
+            <div class="form-group">
+                <label for="username">Alamat Email</label>
+                <input type="text" id="username" required>
+                <div id="usernameError" class="error-message"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Kata Sandi</label>
+                <input type="password" id="password" required>
+                <div class="requirements">
+                    <div class="requirement" id="length">Minimal 8 karakter</div>
+                    <div class="requirement" id="uppercase">Minimal 1 huruf kapital</div>
+                    <div class="requirement" id="lowercase">Minimal 1 huruf kecil</div>
+                    <div class="requirement" id="number">Minimal 1 angka</div>
+                </div>
+                <div id="passwordError" class="error-message"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="confirmPassword">Konfirmasi Kata Sandi</label>
+                <input type="password" id="confirmPassword" required>
+                <div id="confirmPasswordError" class="error-message"></div>
+            </div>
+
+            <button type="submit" id="submitBtn" disabled>Daftar</button>
+        </form>
+    </div>
+
+    <script>
+        const password = document.getElementById('password');
+        const confirmPassword = document.getElementById('confirmPassword');
+        const submitBtn = document.getElementById('submitBtn');
+        const requirements = {
+            length: document.getElementById('length'),
+            uppercase: document.getElementById('uppercase'),
+            lowercase: document.getElementById('lowercase'),
+            number: document.getElementById('number')
+        };
+
+        let passwordValid = false;
+
+        password.addEventListener('input', validatePassword);
+        confirmPassword.addEventListener('input', validatePasswordMatch);
+
+        function validatePassword() {
+            const value = password.value;
+            let valid = true;
+
+            // Mengecek setiap syarat kata sandi menggunakan loop
+            const checks = {
+                length: value.length >= 8,
+                uppercase: /[A-Z]/.test(value),
+                lowercase: /[a-z]/.test(value),
+                number: /[0-9]/.test(value)
+            };
+
+            for (let [requirement, isValid] of Object.entries(checks)) {
+                requirements[requirement].classList.toggle('valid', isValid);
+                valid = valid && isValid;
+            }
+
+            passwordValid = valid;
+            validateForm();
+        }
+
+        function validatePasswordMatch() {
+            const match = password.value === confirmPassword.value;
+            document.getElementById('confirmPasswordError').style.display = 
+                match ? 'none' : 'block';
+            document.getElementById('confirmPasswordError').textContent = 
+                match ? '' : 'Kata sandi tidak sama';
+            validateForm();
+        }
+
+        function validateForm(event) {
+            if (event) event.preventDefault();
+
+            const username = document.getElementById('username').value;
+            const passwordMatch = password.value === confirmPassword.value;
+
+            submitBtn.disabled = !(username && passwordValid && passwordMatch);
+
+            if (event && submitBtn.disabled) {
+                return false;
+            }
+
+            if (event) {
+                // Pop up akun telah terbuat
+                alert('Akun berhasil dibuat, silahkan lakukan konfirmasi melalui email anda!');
+            }
+
+            return true;
+        }
+    </script>
+</body>
+</html>
